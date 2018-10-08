@@ -12,11 +12,8 @@
 ## To build executable:
 ```
 mkdir build
-
 cd build
-
 cmake ..
-
 make
 ```
 
@@ -28,5 +25,6 @@ Command line input:
 ```
 
 Output QR format:
-
+```
 "\<qr code base name\> \<row\> | \<column\>"
+```
