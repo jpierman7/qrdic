@@ -26,5 +26,5 @@ Command line input:
 
 Output QR format:
 ```
-"<qr code base name> <row> | <column>"
+"<image base name> <row> | <column>"
 ```
