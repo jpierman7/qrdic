@@ -237,18 +237,18 @@ void warp_image ( const Mat input_image, Mat &output_image, const vector<float> 
     int warped_y;
     int previous_x;
     
+    int warp_row;
     for ( int x = 0; x < image_size.width; x++ )
     {
         warped_y = int ( round ( get_fx ( fx, x ) ) );
         previous_x = int ( round ( length_integral ( fx, x ) ) ); 
-
-        if ( previous_x < image_size.width )
+        for (int j = 0; j < image_size.height; j++ )
         {
-            for (int j = 100; j < image_size.height-100; j++ )
-            {
-                output_image.at<u_int8_t>( warped_y+j, x ) = input_image.at<u_int8_t>( j, previous_x );
-            }
+            warp_row = warped_y+j;
+            if (warp_row < image_size.height && previous_x < image_size.width )
+                output_image.at<u_int8_t>( warp_row, x ) = input_image.at<u_int8_t>( j, previous_x );
         }
+
 
     }
     cout << "done the rewrite" << endl;

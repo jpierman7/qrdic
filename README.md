@@ -21,7 +21,7 @@ make
 
 Command line input:
 ```
-./genqr <qr code base name> <code stride length>
+./genqr \<image base name\> \<code stride length\> \<polynomial function input\>
 ```
 
 Output QR format:
