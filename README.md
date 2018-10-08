@@ -28,3 +28,9 @@ Output QR format:
 ```
 "<image base name> <row> | <column>"
 ```
+
+## Things to quantify
+- QR code robustness to warping
+- Density & distribution of qr codes vs localization ability and accuracy
+- Target accuracy
+- QR robustness to noise & max likely resolution from current pattern application techniques

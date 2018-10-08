@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <fstream>
+
 #include <string>
 #include <vector>
 #include <chrono>
@@ -19,6 +21,16 @@ using std::uint8_t;
 using qrcodegen::QrCode;
 using qrcodegen::QrSegment;
 
+void write_parameter_file ( const string filestring, const vector<float> coefficients )
+{
+    ofstream outfile ( filestring );
+    outfile << "Polynomial modulation function:\n";
+    for ( int i = 0; i < coefficients.size()-1; i++ )
+    {
+        outfile << coefficients[i] << "x^" << coefficients.size()-1-i << " + ";
+    }
+    outfile << coefficients.back() << endl;
+}
 
 
 void convert_to_mat ( Mat &qr_image, const QrCode qr )
@@ -209,6 +221,7 @@ float polynomial_dydx ( const vector<float> coefficients, const float input )
     return output;
 }
 
+
 float length_integral ( const vector<float> fx,  float upper_bound, float lower_bound = 0, float dx = 0.01 )
 {
 
@@ -227,30 +240,61 @@ float length_integral ( const vector<float> fx,  float upper_bound, float lower_
 
 }
 
+void crop( Mat &image , const int rowstart, const int colstart, const int rowend, const int colend )
+{
+    cout << "cropping to " << colstart << " " << rowstart << " " << colend << " " << rowend << endl;
+        Rect cropper = Rect(colstart,rowstart, colend-colstart, rowend-rowstart);
+        image = image(cropper);
+}
+
 void warp_image ( const Mat input_image, Mat &output_image, const vector<float> fx )
 {
     cout << "beginning the rewrite"<< endl;
-    input_image.copyTo ( output_image );
+    // Copy image and add padding
+    int x_pad = 200;
+    int y_pad = 200;
+    copyMakeBorder ( input_image, output_image, y_pad, y_pad, 0, x_pad, BORDER_CONSTANT, Scalar(255) );
     output_image.setTo ( Scalar(255) );
-
-    Size image_size = input_image.size();
+    Size input_size = input_image.size();
+    Size output_size = output_image.size();
     int warped_y;
     int previous_x;
     
     int warp_row;
-    for ( int x = 0; x < image_size.width; x++ )
+    int max_rewrite_x (0), max_rewrite_y (0);
+    int lowest_y = output_size.height;
+    for ( int x = 0; x < input_size.width; x++ )
     {
         warped_y = int ( round ( get_fx ( fx, x ) ) );
-        previous_x = int ( round ( length_integral ( fx, x ) ) ); 
-        for (int j = 0; j < image_size.height; j++ )
+        if ( warped_y + y_pad < lowest_y && warped_y+y_pad > 0)
         {
-            warp_row = warped_y+j;
-            if (warp_row < image_size.height && previous_x < image_size.width )
+            lowest_y = warped_y + y_pad;
+        }
+
+        previous_x = int ( round ( length_integral ( fx, x ) ) ); 
+        for (int j = 0; j < input_size.height; j++ )
+        {
+            warp_row = warped_y+j+y_pad;
+            
+            if (warp_row < output_size.height && warp_row >= 0 && previous_x < input_size.width && previous_x >= 0)
+            {
+                // cout << warp_row << " " << warped_y << endl;
                 output_image.at<u_int8_t>( warp_row, x ) = input_image.at<u_int8_t>( j, previous_x );
+                if ( warp_row > max_rewrite_y )
+                {
+                    max_rewrite_y = warp_row;
+                }
+                
+                max_rewrite_x = x;
+            }
         }
 
 
     }
+
+    crop ( output_image, lowest_y, 0, max_rewrite_y, max_rewrite_x );
+    
     cout << "done the rewrite" << endl;
     
 }
+
