@@ -21,10 +21,10 @@ make
 
 Command line input:
 ```
-./genqr \<image base name\> \<code stride length\> \<polynomial function input\>
+./genqr <image base name> <code stride length> <polynomial function input>
 ```
 
 Output QR format:
 ```
-"\<qr code base name\> \<row\> | \<column\>"
+"<qr code base name> <row> | <column>"
 ```
