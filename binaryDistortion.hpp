@@ -43,7 +43,7 @@ void convert_to_mat ( Mat &qr_image, const QrCode qr )
     int border = 0;
 	for (int y = -border; y < qr.getSize() + border; y++) {
 		for (int x = -border; x < qr.getSize() + border; x++) {
-			qr_image.at<u_int8_t>(x,y) = u_int8_t(255-255*qr.getModule(x, y));
+			qr_image.at<u_int8_t>(y,x) = u_int8_t(255-255*qr.getModule(x, y));
 		}
 	}
 	// return qr_image;
@@ -103,8 +103,9 @@ void generate_qr_image ( Mat &image, string input_string ) //const char* text )
       
     // convert from string to character array
     char text[n+1];  
-    strcpy(text, input_string.c_str()); 
-	const QrCode::Ecc errCorLvl = QrCode::Ecc::HIGH;  // Error correction level
+    strcpy(text, input_string.c_str());
+    // cout << "converting " << text << " to qr code." << endl;
+	const QrCode::Ecc errCorLvl = QrCode::Ecc::MEDIUM;  // Error correction level
 
 	// Make and print the QR Code symbol
 	const QrCode qr = QrCode::encodeText(text, errCorLvl);
@@ -188,7 +189,6 @@ Mat generate_random_binary (const int row, const int col )
 			random_image.at<u_int8_t>(x,y) = u_int8_t( 255*( rand() % 5 ) );
 		}
 	}
-	
 
 	return random_image;
 }
