@@ -148,7 +148,7 @@ void plant_qr_code ( const Mat input_image, Mat &output_image, const string base
 {
 
     Mat qr_image;
-    generate_qr_image ( qr_image,  base_id + "0|0"  );
+    generate_qr_image ( qr_image,  base_id + "-0|0"  );
     input_image.copyTo ( output_image );
 
     Size kernel     =   qr_image.size();

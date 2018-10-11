@@ -26,8 +26,9 @@ Command line input:
 
 Output QR format:
 ```
-"<image base name> <row> | <column>"
+"<image base name>-<row> | <column>"
 ```
+
 
 ## Decoding qr image
 Command line input:
