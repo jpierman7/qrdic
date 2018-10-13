@@ -33,7 +33,7 @@ Output QR format:
 ## Decoding qr image
 Command line input:
 ```
-./decode <image filename>
+./decode <image1 filename> <image2 filename>
 ```
 Right now the decoder is NOT ROBUST. It won't read qr objects that are rotated or deformed more than a miniscule amount. I'm working on it.
 ## Things to quantify
