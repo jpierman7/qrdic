@@ -22,9 +22,10 @@ int main ( int argc, char** argv )
 
 	// Splice QR code into image
 	plant_qr_code ( random_pic, random_pic, base_id.str(), stride );
+	generate_qr_image ( random_pic, base_id.str() );
 
 	// Resize image;
-	resize ( random_pic, random_pic, Size(700,700), 0, 0, INTER_NEAREST);
+	resize ( random_pic, random_pic, Size(200,200), 0, 0, INTER_NEAREST);
 	cout << "spliced the thing" << endl;
 
 	// Save untampered image

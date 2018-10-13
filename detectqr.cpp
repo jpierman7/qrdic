@@ -11,6 +11,7 @@
 
 #include "opencv2/opencv.hpp"
 #include "binaryDistortion.hpp"
+#include "dictoolbox.hpp"
 
 using namespace std;
 using namespace zbar;
@@ -21,6 +22,7 @@ typedef struct
   string type;
   string data;
   vector <Point> location;
+  int corner [2];
 } decodedObject;
 
 
@@ -57,7 +59,7 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
     cerr << "No symbols found." << endl;
     exit ( EXIT_FAILURE );
   }
-   
+  
   // Print results
   unsigned long datalength = image.get_data_length();
   cout << " finding results from image of size: " << datalength << endl;
@@ -73,10 +75,9 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
     cout << "Data : " << obj.data << endl << endl;
      
     // Obtain location
-    for(int i = 0; i< symbol->get_location_size(); i++)
-    {
-      obj.location.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i)));
-    }
+    obj.corner[0] = symbol->get_location_x(0); obj.corner[1] = symbol->get_location_y(0);
+    cout << obj.corner[0] << " " << obj.corner[1] << endl;
+
      
     decodedObjects.push_back(obj);
   }
@@ -84,18 +85,49 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
 
 int main ( int argc, char** argv )
 {
-  string filename="";
-  filename += argv[1];
 
-  Mat qrcode = imread ( filename );
-
-  namedWindow ( "qr_image");
-  imshow ( "qr_image", qrcode );
-  waitKey ( 0 );
-
+  // Load files into memory as Mat image objects
+  string filename1="", filename2="";
+  filename1 += argv[1]; filename2+=argv[2];
+  Mat im1 = imread ( filename1 ), im2 = imread ( filename2 ) ;
   
-  vector<decodedObject> qrinfo ;
-  decode ( qrcode, qrinfo);
+
+  // Decode available qr info
+  vector<decodedObject> qrinfo1, qrinfo2 ;
+  decode ( im1, qrinfo1);
+
+  // Determine Global displacement, segment image by individual qr code
+
+
+// For each qr code match:
+  // Pad images to be same dimensions
+  Size s1 = im1.size();
+  Size s2 = im2.size();
+  int height (800), width (800);
+  Mat temp1, temp2;
+  cout << height - s1.height << " " << width - s1.width << endl;
+  copyMakeBorder ( im1, temp1, 0, height-s1.height, 0, width-s1.width, BORDER_CONSTANT, Scalar(255,255,255) );
+  copyMakeBorder ( im2, temp2, 0, height-s2.height, 0, width-s2.width, BORDER_CONSTANT, Scalar(255,255,255) );
+
+  // match_features ( temp1, temp2, 400 );
+
+
+  // Determine local displacement
+  optical_flow ( temp1, temp2 );
+  imshow( "optical flow", temp1);
+  imshow("mutilated", temp2 );
+  waitKey(0);
+
+
+/* 
+  At this point in time, there is no:
+    -Global displacement 
+    -Separation of individual qr codes
+    -Robustness to noise/rotation
+    -Validation method / quantification of results
+*/
+
+
   return 0;
 
 }

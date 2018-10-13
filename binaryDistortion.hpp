@@ -146,7 +146,7 @@ void applySplicing ( const Mat input_image, Mat &output_image, const Mat qr_imag
 
 void plant_qr_code ( const Mat input_image, Mat &output_image, const string base_id, const int stride = 0)
 {
-
+    
     Mat qr_image;
     generate_qr_image ( qr_image,  base_id + "-0|0"  );
     input_image.copyTo ( output_image );
