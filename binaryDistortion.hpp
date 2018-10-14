@@ -167,9 +167,9 @@ void plant_qr_code ( const Mat input_image, Mat &output_image, const string base
     Size new_size = output_image.size();
 
     cout << "Iterating logic kernel" << endl;
-    for ( int i = 0; i <= new_size.height-row_step; i += row_step)
+    for ( int i = 5; i <= new_size.height-row_step; i += row_step)
     {
-        for ( int j = 0; j <= new_size.width-row_step; j += row_step)
+        for ( int j = 5; j <= new_size.width-row_step; j += row_step)
         {
             generate_qr_image ( qr_image, base_id + "-" + to_string(i) + "|" + to_string(j) );
             apply_kernel ( output_image, qr_image, i, j );
