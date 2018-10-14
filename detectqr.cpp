@@ -35,11 +35,9 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
   ImageScanner scanner;
  
   // Configure scanner
-  scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
+  scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
    
   // Convert image to grayscale
-
-  
   Mat imGray;
   cvtColor(im, imGray, CV_BGR2GRAY);
  
@@ -48,6 +46,7 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
  
   // Scan the image for barcodes and QRCodes
   int n = scanner.scan(image);
+  
 
   if ( n == -1 )
   {
@@ -58,6 +57,10 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
   {
     cerr << "No symbols found." << endl;
     exit ( EXIT_FAILURE );
+  }
+  else
+  {
+    cout << "finished scanning" << endl;
   }
   
   // Print results
@@ -94,6 +97,7 @@ int main ( int argc, char** argv )
 
   // Decode available qr info
   vector<decodedObject> qrinfo1, qrinfo2 ;
+  cout << "decoding image 1" << endl;
   decode ( im1, qrinfo1);
 
   // Determine Global displacement, segment image by individual qr code
@@ -103,9 +107,8 @@ int main ( int argc, char** argv )
   // Pad images to be same dimensions
   Size s1 = im1.size();
   Size s2 = im2.size();
-  int height (800), width (800);
+  int height (400), width (400);
   Mat temp1, temp2;
-  cout << height - s1.height << " " << width - s1.width << endl;
   copyMakeBorder ( im1, temp1, 0, height-s1.height, 0, width-s1.width, BORDER_CONSTANT, Scalar(255,255,255) );
   copyMakeBorder ( im2, temp2, 0, height-s2.height, 0, width-s2.width, BORDER_CONSTANT, Scalar(255,255,255) );
 
@@ -113,9 +116,11 @@ int main ( int argc, char** argv )
 
 
   // Determine local displacement
-  optical_flow ( temp1, temp2 );
-  imshow( "optical flow", temp1);
-  imshow("mutilated", temp2 );
+  Mat overlay;
+  optical_flow ( temp1, temp2, overlay );
+  cout << overlay.size << endl;
+  imshow( "optical flow", overlay );
+  // imshow("mutilated", temp2 );
   waitKey(0);
 
 

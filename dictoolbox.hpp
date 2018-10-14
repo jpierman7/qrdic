@@ -23,6 +23,22 @@ using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
 
+void overlay_images ( const Mat im1, const Mat im2, Mat &merged )
+{
+    Mat gray1, gray2;
+    cvtColor ( im1, gray1, CV_RGB2GRAY );
+    cvtColor ( im2, gray2, CV_RGB2GRAY );
+    cout << "converted to grayscale. channel number: " << gray1.channels() << endl;
+
+    Mat white ( gray1.rows, gray1.cols, gray1.type(), Scalar(255) );
+    std::vector<cv::Mat> images(3);
+
+    images.at(0) = white; //for blue channel
+    images.at(1) = gray1;   //for green channel
+    images.at(2) = gray2;  //for red channel
+    cout <<"vectorized"<<endl;
+    cv::merge(images, merged);
+}
 
 void match_features ( const Mat img_1, const Mat img_2, const int minFeatures )
 {   
@@ -70,7 +86,7 @@ void match_features ( const Mat img_1, const Mat img_2, const int minFeatures )
 
 }
 
-void optical_flow ( Mat &img_1, const Mat img_2 )
+void optical_flow ( const Mat img_1, const Mat img_2, Mat &overlay )
 {
     Mat gray1, gray2;
     cvtColor ( img_1, gray1, CV_BGR2GRAY) ;
@@ -81,9 +97,12 @@ void optical_flow ( Mat &img_1, const Mat img_2 )
     vector<Point2f> points[2];
     goodFeaturesToTrack(gray1, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 3, 0, 0.04);
     calcOpticalFlowPyrLK ( gray1, gray2, points[0], points[1], status, err );
+    overlay_images(img_1, img_2, overlay);
+    cout << " overlayed " << endl;
+
     for ( int i = 0; i < points[0].size(); i++ )
     {
-        arrowedLine(img_1,  points[0][i], points[1][i], Scalar(255,0,0), 2 );
+        arrowedLine(overlay,  points[0][i], points[1][i], Scalar(255,0,0), 2 );
     }
 
 }
